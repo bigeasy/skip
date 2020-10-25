@@ -1,2 +1,2 @@
-exports.strata = require('./skip')
+exports.strata = require('./strata')
 exports.array = require('./array')

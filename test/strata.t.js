@@ -1,4 +1,6 @@
 require('proof')(6, async okay => {
+    const skip = require('../strata')
+
     const path = require('path')
 
     const ascension = require('ascension')
@@ -21,7 +23,6 @@ require('proof')(6, async okay => {
       '1.1': [ [ 'right', [ 'g', 0 ] ], [ 'insert', 0, [ 'd', 0 ] ], [ 'insert', 1, [ 'e', 0 ] ] ],
       '1.3': [ [ 'insert', 0, [ 'g', 0 ] ], [ 'insert', 1, [ 'h', 0 ] ], [ 'insert', 2, [ 'j', 0 ] ], [ 'delete', 0 ] ]
     })
-    const skip = require('../skip')
 
     const set = [ 'a', 'b', 'c', 'e', 'f', 'g', 'j' ].map(letter => [ letter, 0 ])
     const expected = set.map(letter => {
