@@ -29,7 +29,6 @@
                             "proof":                        "^9.0.2",
                             "reciprocate":                  "0.0.1"
     },
-    "main":                 "skip",
     "scripts":
     {
                             "test": "proof test/*.t.js"
