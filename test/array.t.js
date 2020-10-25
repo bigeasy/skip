@@ -1,13 +1,12 @@
-require('proof')(3, okay => {
+require('proof')(5, okay => {
     const skip = { array: require('../array') }
 
     const assert = require('assert')
 
+    const ascension = require('ascension')
     const Trampoline = require('reciprocate')
 
-    const array = [ 'a', 'b', 'c', 'f', 'g', 'j', 'k', 'l' ].map(letter => {
-        return { key: letter, parts: [ letter ] }
-    })
+    const letters = [ 'a', 'b', 'c', 'f', 'g', 'j', 'k', 'l' ]
     const comparator = (left, right) => (left > right) - (left < right)
 
     const set = [ 'b', 'c', 'e', 'j', 'm' ]
@@ -18,6 +17,9 @@ require('proof')(3, okay => {
 
     {
         const trampoline = new Trampoline
+        const array = letters.map(letter => {
+            return { key: letter, parts: [ letter ] }
+        })
         const iterator = skip.array(comparator, array, set)
         const gathered = []
         while (! iterator.done) {
@@ -30,5 +32,36 @@ require('proof')(3, okay => {
         }
         okay(!trampoline.seek(), 'defaults no async actions')
         okay(gathered, expected, 'defaults')
+    }
+
+    {
+        const trampoline = new Trampoline
+        const array = letters.map(letter => {
+            return { key: [ letter, 0 ], parts: [ letter ] }
+        })
+        array.splice(1, 0, {
+            key: [ 'a', 1 ], parts: [ 'a' ]
+        })
+        const comparator = ascension([ String, Number ], object => object)
+        const partial = ascension([ String ], object => object)
+        const iterator = skip.array(comparator, array, [ [ 'a' ], [ 'c' ] ], {
+            filter: (sought, items, index) => {
+                return partial(sought[0], items[index].key[0]) == 0
+            }
+        })
+        const gathered = []
+        while (! iterator.done) {
+            iterator.next(trampoline, items => {
+                for (const item of items) {
+                    gathered.push(item)
+                }
+            })
+        }
+        okay(!trampoline.seek(), 'partial no async actions')
+        okay(gathered, [
+            { key: [ 'a', 0 ], parts: [ 'a' ], value: [ 'a' ] },
+            { key: [ 'a', 1 ], parts: [ 'a' ], value: [ 'a' ] },
+            { key: [ 'c', 0 ], parts: [ 'c' ], value: [ 'c' ] }
+        ], 'partial')
     }
 })

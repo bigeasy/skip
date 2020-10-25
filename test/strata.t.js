@@ -68,7 +68,7 @@ require('proof')(6, async okay => {
     }
 
     {
-        const destructible = new Destructible([ 'defaults' ])
+        const destructible = new Destructible([ 'specified' ])
         const strata = new Strata(destructible, { directory, cache: new Cache })
         await strata.open()
         const gathered = [], trampoline = new Trampoline
@@ -94,12 +94,12 @@ require('proof')(6, async okay => {
                 await trampoline.shift()
             }
         }
-        okay(gathered, expected, 'defaults')
+        okay(gathered, expected, 'specified')
         strata.destructible.destroy().rejected
     }
 
     {
-        const destructible = new Destructible([ 'defaults' ])
+        const destructible = new Destructible([ 'reversed' ])
         const strata = new Strata(destructible, { directory, cache: new Cache })
         await strata.open()
         const gathered = [], trampoline = new Trampoline
@@ -127,7 +127,7 @@ require('proof')(6, async okay => {
         const gathered = [], trampoline = new Trampoline
         const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ] ], {
             filter: (sought, items, index) => {
-                return partial(sought, items[index].key[0]) == 0
+                return partial(sought[0], items[index].key[0]) == 0
             }
         })
         while (!iterator.done) {
