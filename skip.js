@@ -1,6 +1,9 @@
 // Of course to reverse, you would just pass in the set in reverse order.
 module.exports = function (strata, set, {
-    nullify = key => { return { key, parts: null } }, extractor = $ => $, slice = 32
+    nullify = key => { return { key, parts: null } },
+    extractor = $ => $,
+    filter = (sought, array, index, found) => found,
+    slice = 32
 } = {}) {
     const keys = set[Symbol.iterator]()
     let index = 0
@@ -16,10 +19,18 @@ module.exports = function (strata, set, {
             const { value } = next
             const sought = extractor(value)
             strata.search(trampoline, sought, cursor => {
-                const got = [], { page, found, index } = cursor
-                if (found) {
-                    const { key, parts } = page.items[index]
+                const got = [], { page: { items }, found, index } = cursor, I = items.length
+                if (index < I && filter(sought, items, index, found)) {
+                    const { key, parts } = items[index]
                     got.push({ key, parts, value })
+                    for (
+                        let i = index + 1;
+                        i < I && filter(sought, items, i, false);
+                        i++
+                    ) {
+                        const { key, parts } = items[i]
+                        got.push({ key, parts, value })
+                    }
                 } else {
                     got.push({ ...nullify(sought), value })
                 }
@@ -32,9 +43,20 @@ module.exports = function (strata, set, {
                     if (index == null) {
                         break
                     }
-                    if (found) {
-                        const { key, parts } = page.items[index]
+                    if (
+                        index < I &&
+                        filter(sought, items, index, found)
+                    ) {
+                        const { key, parts } = items[index]
                         got.push({ key, parts, value })
+                        for (
+                            let i = index + 1;
+                            i < I && filter(sought, items, i, false);
+                            i++
+                        ) {
+                            const { key, parts } = items[i]
+                            got.push({ key, parts, value })
+                        }
                     } else {
                         got.push({ ...nullify(sought), value })
                     }
