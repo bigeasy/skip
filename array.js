@@ -26,16 +26,16 @@ module.exports = function (comparator, array, set, {
                 const sought = extractor(value)
                 const index = find(comparator, array, sought, 0)
                 let found = index >= 0
-                let i = found ? index : ~index
+                let i = found ? index : ~index, order = 1
                 if (i < I && filter(sought, array, i, found)) {
                     const { key, parts } = array[i++]
-                    got.push({ key, parts, value })
+                    got.push({ key, parts, value, index: 0 })
                     while (i < I && filter(sought, array, i, false)) {
                         const { key, parts } = array[i++]
-                        got.push({ key, parts, value })
+                        got.push({ key, parts, value, index: order++ })
                     }
                 } else {
-                    got.push({ ...nullify(sought), value })
+                    got.push({ ...nullify(sought), value, index: -1 })
                 }
                 next = keys.next()
             }
