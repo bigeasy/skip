@@ -1,6 +1,6 @@
 // Of course to reverse, you would just pass in the set in reverse order.
 module.exports = function (strata, set, {
-    nullify = sought => { return { key: null, parts: null } },
+    nullify = (sought, value) => { return { key: null, parts: null } },
     extractor = $ => $,
     group = (sought, key, found) => found,
     slice = 32
@@ -42,7 +42,7 @@ module.exports = function (strata, set, {
                         return
                     }
                 } else {
-                    got.push({ ...nullify(sought), sought: { key: sought, value }, index: -1 })
+                    got.push({ ...nullify(sought, value), sought: { key: sought, value }, index: -1 })
                 }
                 offset = 0
                 for (;;) {
@@ -73,7 +73,7 @@ module.exports = function (strata, set, {
                             break
                         }
                     } else {
-                        got.push({ ...nullify(sought), sought: { key: sought, value }, index: -1 })
+                        got.push({ ...nullify(sought, value), sought: { key: sought, value }, index: -1 })
                     }
                 }
                 consume(got)
