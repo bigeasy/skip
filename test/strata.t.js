@@ -17,11 +17,13 @@ require('proof')(6, async okay => {
 
     await utilities.reset(directory)
     await utilities.serialize(directory, {
-      '0.0': [ [ '0.1', null ], [ '1.1', [ 'd', 0 ] ], [ '1.3', [ 'g', 0 ] ] ],
-      '0.1': [ [ 'right', 'd' ], [ 'insert', 0, [ 'a', 0 ] ], [ 'insert', 1, [ 'a', 1 ] ],
+      '0.0': [ [ '0.1', null ], [ '1.1', [ 'c', 2 ] ], [ '1.3', [ 'e', 1 ] ], [ '1.5', [ 'm', 1 ] ] ],
+      '0.1': [ [ 'right', [ 'c', 2 ] ], [ 'insert', 0, [ 'a', 0 ] ], [ 'insert', 1, [ 'a', 1 ] ],
         [ 'insert', 2, [ 'b', 0 ] ], [ 'insert', 3, [ 'c', 0 ] ], [ 'insert', 4, [ 'c', 1 ] ] ],
-      '1.1': [ [ 'right', [ 'g', 0 ] ], [ 'insert', 0, [ 'd', 0 ] ], [ 'insert', 1, [ 'e', 0 ] ] ],
-      '1.3': [ [ 'insert', 0, [ 'g', 0 ] ], [ 'insert', 1, [ 'h', 0 ] ], [ 'insert', 2, [ 'j', 0 ] ], [ 'delete', 0 ] ]
+      '1.1': [ [ 'right', [ 'g', 0 ] ], [ 'insert', 0, [ 'c', 2 ] ], [ 'insert', 1, [ 'd', 0 ] ], [ 'insert', 2, [ 'e', 0 ] ] ],
+      '1.3': [ [ 'right', [ 'm', 1 ] ] ,[ 'insert', 0, [ 'g', 0 ] ], [ 'insert', 1, [ 'h', 0 ] ], [ 'insert', 2, [ 'j', 0 ] ],
+        [ 'insert', 3, [ 'm', 0 ] ], [ 'delete', 0 ] ],
+      '1.5': [ [ 'insert', 0, [ 'm', 1 ] ], [ 'insert', 1, [ 'm', 2 ] ], [ 'delete', 0 ] ]
     })
 
     const set = [ 'a', 'b', 'c', 'e', 'f', 'g', 'j' ].map(letter => [ letter, 0 ])
@@ -125,7 +127,7 @@ require('proof')(6, async okay => {
         const strata = new Strata(destructible, { directory, cache: new Cache })
         await strata.open()
         const gathered = [], trampoline = new Trampoline
-        const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ] ], {
+        const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ], [ 'm' ] ], {
             filter: (sought, key) => {
                 return partial(sought[0], key[0]) == 0
             }
@@ -145,7 +147,10 @@ require('proof')(6, async okay => {
             { key: [ 'a', 1 ], parts: [ [ 'a', 1 ] ], value: [ 'a' ] },
             { key: [ 'b', 0 ], parts: [ [ 'b', 0 ] ], value: [ 'b' ] },
             { key: [ 'c', 0 ], parts: [ [ 'c', 0 ] ], value: [ 'c' ] },
-            { key: [ 'c', 1 ], parts: [ [ 'c', 1 ] ], value: [ 'c' ] }
+            { key: [ 'c', 1 ], parts: [ [ 'c', 1 ] ], value: [ 'c' ] },
+            { key: [ 'c', 2 ], parts: [ [ 'c', 2 ] ], value: [ 'c' ] },
+            { key: [ 'm', 0 ], parts: [ [ 'm', 0 ] ], value: [ 'm' ] },
+            { key: [ 'm', 2 ], parts: [ [ 'm', 2 ] ], value: [ 'm' ] }
         ], 'partial')
         strata.destructible.destroy().rejected
     }

@@ -20,25 +20,17 @@ module.exports = function (strata, set, {
                       ? continued
                       : sought = extractor(value)
             strata.search(trampoline, key, cursor => {
-                const got = [], { page: { id, items, right }, found, index } = cursor, I = items.length
-                const reallyFound = continued == null && found
-                continued = null
-                if (index < I && filter(sought, items[index].key, reallyFound)) {
+                const got = [], { page: { items, right }, found, index } = cursor, I = items.length
+                if (index < I && filter(sought, items[index].key, found)) {
                     const { key, parts } = items[index]
                     got.push({ key, parts, value })
-                    let i
                     for (
-                        i = index + 1;
+                        let i = index + 1;
                         i < I && filter(sought, items[i].key, false);
                         i++
                     ) {
                         const { key, parts } = items[i]
                         got.push({ key, parts, value })
-                    }
-                    if (i == I && right != null && filter(sought, right, false)) {
-                        continued = right
-                        consume(got)
-                        return
                     }
                 } else {
                     got.push({ ...nullify(sought), value })
@@ -47,27 +39,27 @@ module.exports = function (strata, set, {
                     if ((next = keys.next()).done || got.length >= slice) {
                         break
                     }
-                    const { value } = next
-                    sought = extractor(value)
+                    const { value } = next, sought = extractor(value)
                     const { found, index } = cursor.indexOf(sought)
                     if (index == null) {
                         break
                     }
-                    if (index < I && filter(sought, items[index].key, found)) {
+                    if (index == I) {
+                        if (right != null && filter(sought, right, false)) {
+                            continued = right
+                        }
+                    } else if (
+                        filter(sought, items[index].key, found)
+                    ) {
                         const { key, parts } = items[index]
                         got.push({ key, parts, value })
-                        let i
                         for (
-                            i = index + 1;
+                            let i = index + 1;
                             i < I && filter(sought, items[i].key, false);
                             i++
                         ) {
                             const { key, parts } = items[i]
                             got.push({ key, parts, value })
-                        }
-                        if (i == I && right != null && filter(sought, right, false)) {
-                            continued = right
-                            break
                         }
                     } else {
                         got.push({ ...nullify(sought), value })
