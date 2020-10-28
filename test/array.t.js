@@ -13,9 +13,9 @@ require('proof')(5, okay => {
 
     const expected = set.map(letter => {
         return {
-            key: letter,
+            key: /^e|m$/.test(letter) ? null : letter,
             parts: /^e|m$/.test(letter) ? null : [ letter ],
-            value: letter,
+            sought: { key: letter, value: letter },
             index: /^e|m$/.test(letter) ? -1 : 0
         }
     })
@@ -64,10 +64,10 @@ require('proof')(5, okay => {
         }
         okay(!trampoline.seek(), 'partial no async actions')
         okay(gathered, [
-            { key: [ 'a', 0 ], parts: [ 'a' ], value: [ 'a' ], index: 0, },
-            { key: [ 'a', 1 ], parts: [ 'a' ], value: [ 'a' ], index: 1 },
-            { key: [ 'c', 0 ], parts: [ 'c' ], value: [ 'c' ], index: 0 },
-            { key: [ 'd' ], parts: null, value: [ 'd' ], index: -1 }
+            { key: [ 'a', 0 ], parts: [ 'a' ], sought: { key: [ 'a' ], value: [ 'a' ] }, index: 0, },
+            { key: [ 'a', 1 ], parts: [ 'a' ], sought: { key: [ 'a' ], value: [ 'a' ] }, index: 1 },
+            { key: [ 'c', 0 ], parts: [ 'c' ], sought: { key: [ 'c' ], value: [ 'c' ] }, index: 0 },
+            { key: null, parts: null, sought: { key: [ 'd' ], value: [ 'd' ] }, index: -1 }
         ], 'partial')
     }
 })

@@ -1,6 +1,6 @@
 // Of course to reverse, you would just pass in the set in reverse order.
 module.exports = function (strata, set, {
-    nullify = key => { return { key, parts: null } },
+    nullify = sought => { return { key: null, parts: null } },
     extractor = $ => $,
     group = (sought, key, found) => found,
     slice = 32
@@ -25,7 +25,7 @@ module.exports = function (strata, set, {
                 continued = null
                 if (index < I && group(sought, items[index].key, reallyFound)) {
                     const { key, parts } = items[index]
-                    got.push({ key, parts, value, index: offset + 0 })
+                    got.push({ key, parts, sought: { key: sought, value }, index: offset + 0 })
                     let i
                     for (
                         i = index + 1;
@@ -33,7 +33,7 @@ module.exports = function (strata, set, {
                         i++
                     ) {
                         const { key, parts } = items[i]
-                        got.push({ key, parts, value, index: offset + i - index })
+                        got.push({ key, parts, sought: { key: sought, value }, index: offset + i - index })
                     }
                     if (i == I && right != null && group(sought, right, false)) {
                         continued = right
@@ -42,7 +42,7 @@ module.exports = function (strata, set, {
                         return
                     }
                 } else {
-                    got.push({ ...nullify(sought), value, index: -1 })
+                    got.push({ ...nullify(sought), sought: { key: sought, value }, index: -1 })
                 }
                 offset = 0
                 for (;;) {
@@ -57,7 +57,7 @@ module.exports = function (strata, set, {
                     }
                     if (index < I && group(sought, items[index].key, found)) {
                         const { key, parts } = items[index]
-                        got.push({ key, parts, value, index: 0 })
+                        got.push({ key, parts, sought: { key: sought, value }, index: 0 })
                         let i
                         for (
                             i = index + 1;
@@ -65,7 +65,7 @@ module.exports = function (strata, set, {
                             i++
                         ) {
                             const { key, parts } = items[i]
-                            got.push({ key, parts, value, index: i - index })
+                            got.push({ key, parts, sought: { key: sought, value }, index: i - index })
                         }
                         if (i == I && right != null && group(sought, right, false)) {
                             continued = right
@@ -73,7 +73,7 @@ module.exports = function (strata, set, {
                             break
                         }
                     } else {
-                        got.push({ ...nullify(sought), value, index: -1 })
+                        got.push({ ...nullify(sought), sought: { key: sought, value }, index: -1 })
                     }
                 }
                 consume(got)
