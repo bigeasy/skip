@@ -50,7 +50,7 @@ require('proof')(5, okay => {
         const comparator = ascension([ String, Number ], object => object)
         const partial = ascension([ String ], object => object)
         const iterator = skip.array(comparator, array, [ [ 'a' ], [ 'c' ], [ 'd' ] ], {
-            filter: (sought, items, index) => {
+            group: (sought, items, index) => {
                 return partial(sought[0], items[index].key[0]) == 0
             }
         })

@@ -2,10 +2,7 @@
 module.exports = function (strata, set, {
     nullify = key => { return { key, parts: null } },
     extractor = $ => $,
-    // TODO Occurs to me that filter is a misnomer since we are not rejecting
-    // based on a key but finding bounaries. Maybe the function name should be
-    // `bound` or better still `partition`, no `group`.
-    filter = (sought, key, found) => found,
+    group = (sought, key, found) => found,
     slice = 32
 } = {}) {
     const keys = set[Symbol.iterator]()
@@ -26,19 +23,19 @@ module.exports = function (strata, set, {
                 const got = [], { page: { id, items, right }, found, index } = cursor, I = items.length
                 const reallyFound = continued == null && found
                 continued = null
-                if (index < I && filter(sought, items[index].key, reallyFound)) {
+                if (index < I && group(sought, items[index].key, reallyFound)) {
                     const { key, parts } = items[index]
                     got.push({ key, parts, value, index: offset + 0 })
                     let i
                     for (
                         i = index + 1;
-                        i < I && filter(sought, items[i].key, false);
+                        i < I && group(sought, items[i].key, false);
                         i++
                     ) {
                         const { key, parts } = items[i]
                         got.push({ key, parts, value, index: offset + i - index })
                     }
-                    if (i == I && right != null && filter(sought, right, false)) {
+                    if (i == I && right != null && group(sought, right, false)) {
                         continued = right
                         offset = i - index
                         consume(got)
@@ -58,19 +55,19 @@ module.exports = function (strata, set, {
                     if (index == null) {
                         break
                     }
-                    if (index < I && filter(sought, items[index].key, found)) {
+                    if (index < I && group(sought, items[index].key, found)) {
                         const { key, parts } = items[index]
                         got.push({ key, parts, value, index: 0 })
                         let i
                         for (
                             i = index + 1;
-                            i < I && filter(sought, items[i].key, false);
+                            i < I && group(sought, items[i].key, false);
                             i++
                         ) {
                             const { key, parts } = items[i]
                             got.push({ key, parts, value, index: i - index })
                         }
-                        if (i == I && right != null && filter(sought, right, false)) {
+                        if (i == I && right != null && group(sought, right, false)) {
                             continued = right
                             offset = i - index
                             break

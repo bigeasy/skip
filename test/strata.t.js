@@ -129,7 +129,7 @@ require('proof')(6, async okay => {
         await strata.open()
         const gathered = [], trampoline = new Trampoline
         const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ], [ 'm' ], [ 'n' ] ], {
-            filter: (sought, key) => {
+            group: (sought, key) => {
                 return partial(sought[0], key[0]) == 0
             }
         })

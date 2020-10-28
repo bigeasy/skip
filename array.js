@@ -1,7 +1,7 @@
 const find = require('b-tree/find')
 
 module.exports = function (comparator, array, set, {
-    filter = (sought, array, index, found) => found,
+    group = (sought, array, index, found) => found,
     nullify = key => { return { key, parts: null } },
     extractor = $ => $,
     slice = 32
@@ -27,10 +27,10 @@ module.exports = function (comparator, array, set, {
                 const index = find(comparator, array, sought, 0)
                 let found = index >= 0
                 let i = found ? index : ~index, order = 1
-                if (i < I && filter(sought, array, i, found)) {
+                if (i < I && group(sought, array, i, found)) {
                     const { key, parts } = array[i++]
                     got.push({ key, parts, value, index: 0 })
-                    while (i < I && filter(sought, array, i, false)) {
+                    while (i < I && group(sought, array, i, false)) {
                         const { key, parts } = array[i++]
                         got.push({ key, parts, value, index: order++ })
                     }
