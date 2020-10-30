@@ -6,7 +6,7 @@ module.exports = function (strata, set, {
     slice = 32
 } = {}) {
     const keys = set[Symbol.iterator]()
-    let index = 0, sought = null, continued = null, offset = 0
+    let index = 0, sought = null, continued = null, entry = null
     let next = keys.next()
     const iterator = {
         done: false,
@@ -22,10 +22,13 @@ module.exports = function (strata, set, {
             strata.search(trampoline, key, cursor => {
                 const got = [], { page: { id, items, right }, found, index } = cursor, I = items.length
                 const reallyFound = continued == null && found
+                if (continued == null) {
+                    entry = { key: sought, value: value, items: [] }
+                }
                 continued = null
                 if (index < I && group(sought, items[index].key, reallyFound)) {
                     const { key, parts } = items[index]
-                    got.push({ key, parts, sought: { key: sought, value }, index: offset + 0 })
+                    entry.items.push({ key, parts })
                     let i
                     for (
                         i = index + 1;
@@ -33,18 +36,15 @@ module.exports = function (strata, set, {
                         i++
                     ) {
                         const { key, parts } = items[i]
-                        got.push({ key, parts, sought: { key: sought, value }, index: offset + i - index })
+                        entry.items.push({ key, parts })
                     }
                     if (i == I && right != null && group(sought, right, false)) {
                         continued = right
-                        offset = i - index
                         consume(got)
                         return
                     }
-                } else {
-                    got.push({ ...nullify(sought, value), sought: { key: sought, value }, index: -1 })
                 }
-                offset = 0
+                got.push(entry)
                 for (;;) {
                     if ((next = keys.next()).done || got.length >= slice) {
                         break
@@ -55,9 +55,10 @@ module.exports = function (strata, set, {
                     if (index == null) {
                         break
                     }
+                    entry = { key: sought, value: value, items: [] }
                     if (index < I && group(sought, items[index].key, found)) {
                         const { key, parts } = items[index]
-                        got.push({ key, parts, sought: { key: sought, value }, index: 0 })
+                        entry.items.push({ key, parts })
                         let i
                         for (
                             i = index + 1;
@@ -65,16 +66,14 @@ module.exports = function (strata, set, {
                             i++
                         ) {
                             const { key, parts } = items[i]
-                            got.push({ key, parts, sought: { key: sought, value }, index: i - index })
+                            entry.items.push({ key, parts })
                         }
                         if (i == I && right != null && group(sought, right, false)) {
                             continued = right
-                            offset = i - index
                             break
                         }
-                    } else {
-                        got.push({ ...nullify(sought, value), sought: { key: sought, value }, index: -1 })
                     }
+                    got.push(entry)
                 }
                 consume(got)
             })

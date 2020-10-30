@@ -29,10 +29,9 @@ require('proof')(6, async okay => {
     const set = [ 'a', 'b', 'c', 'e', 'f', 'g', 'j' ].map(letter => [ letter, 0 ])
     const expected = set.map(letter => {
         return {
-            key: /^f|g$/.test(letter[0]) ? null : letter,
-            parts: /^f|g$/.test(letter[0]) ? null : [ letter ],
-            sought: { key: letter, value: letter },
-            index: /^f|g$/.test(letter[0]) ? -1 : 0
+            key: letter,
+            value: letter,
+            items: /^f|g$/.test(letter[0]) ? [] : [{ key: letter, parts: [ letter ] }]
         }
     })
 
@@ -144,16 +143,41 @@ require('proof')(6, async okay => {
             }
         }
         okay(gathered, [
-            { key: [ 'a', 0 ], parts: [ [ 'a', 0 ] ], sought: { key: [ 'a' ], value: [ 'a' ] }, index: 0 },
-            { key: [ 'a', 1 ], parts: [ [ 'a', 1 ] ], sought: { key: [ 'a' ], value: [ 'a' ] }, index: 1 },
-            { key: [ 'b', 0 ], parts: [ [ 'b', 0 ] ], sought: { key: [ 'b' ], value: [ 'b' ] }, index: 0 },
-            { key: [ 'c', 0 ], parts: [ [ 'c', 0 ] ], sought: { key: [ 'c' ], value: [ 'c' ] }, index: 0 },
-            { key: [ 'c', 1 ], parts: [ [ 'c', 1 ] ], sought: { key: [ 'c' ], value: [ 'c' ] }, index: 1 },
-            { key: [ 'c', 2 ], parts: [ [ 'c', 2 ] ], sought: { key: [ 'c' ], value: [ 'c' ] }, index: 2 },
-            { key: [ 'm', 0 ], parts: [ [ 'm', 0 ] ], sought: { key: [ 'm' ], value: [ 'm' ] }, index: 0 },
-            { key: [ 'm', 2 ], parts: [ [ 'm', 2 ] ], sought: { key: [ 'm' ], value: [ 'm' ] }, index: 1 },
-            { key: [ 'm', 3 ], parts: [ [ 'm', 3 ] ], sought: { key: [ 'm' ], value: [ 'm' ] }, index: 2 },
-            { key: null, parts: null, sought: { key: [ 'n' ], value: [ 'n' ] }, index: -1 }
+            {
+                key: [ 'a' ],
+                value: [ 'a' ],
+                items: [{
+                    key: [ 'a', 0 ], parts: [[ 'a', 0 ]]
+                }, {
+                    key: [ 'a', 1 ], parts: [[ 'a', 1 ]]
+                }]
+            }, {
+                key: [ 'b' ],
+                value: [ 'b' ],
+                items: [{ key: [ 'b', 0 ], parts: [[ 'b', 0 ]] }]
+             }, {
+                key: [ 'c' ],
+                value: [ 'c' ],
+                items: [{
+                    key: [ 'c', 0 ], parts: [ [ 'c', 0 ] ]
+                }, {
+                    key: [ 'c', 1 ], parts: [ [ 'c', 1 ] ]
+                }, {
+                    key: [ 'c', 2 ], parts: [ [ 'c', 2 ] ],
+                }],
+            }, {
+                key: [ 'm' ],
+                value: [ 'm' ],
+                items: [{
+                    key: [ 'm', 0 ], parts: [ [ 'm', 0 ] ],
+                }, {
+                    key: [ 'm', 2 ], parts: [ [ 'm', 2 ] ],
+                }, {
+                    key: [ 'm', 3 ], parts: [ [ 'm', 3 ] ]
+                }]
+            }, {
+               key: [ 'n' ], value: [ 'n' ], items: []
+           }
         ], 'partial')
         strata.destructible.destroy().rejected
     }

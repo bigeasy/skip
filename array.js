@@ -27,15 +27,15 @@ module.exports = function (comparator, array, set, {
                 const index = find(comparator, array, sought, 0)
                 let found = index >= 0
                 let i = found ? index : ~index, order = 1
+                const entry = { key: sought, value, items: [] }
+                got.push(entry)
                 if (i < I && group(sought, array, i, found)) {
                     const { key, parts } = array[i++]
-                    got.push({ key, parts, sought: { key: sought , value }, index: 0 })
+                    entry.items.push({ key, parts })
                     while (i < I && group(sought, array, i, false)) {
                         const { key, parts } = array[i++]
-                        got.push({ key, parts, sought: { key: sought, value }, index: order++ })
+                        entry.items.push({ key, parts })
                     }
-                } else {
-                    got.push({ ...nullify(sought, value), sought: { key: sought, value }, index: -1 })
                 }
                 next = keys.next()
             }
