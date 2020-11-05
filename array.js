@@ -1,3 +1,5 @@
+const mvcc = require('mvcc')
+
 const find = require('b-tree/find')
 
 module.exports = function (comparator, array, set, {
@@ -12,6 +14,7 @@ module.exports = function (comparator, array, set, {
     let next = keys.next()
     const iterator = {
         done: false,
+        type: mvcc.MAP,
         next (trampoline, consume, terminator = iterator) {
             if (next.done) {
                 terminator.done = true

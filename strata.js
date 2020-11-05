@@ -1,3 +1,5 @@
+const mvcc = require('mvcc')
+
 // Of course to reverse, you would just pass in the set in reverse order.
 module.exports = function (strata, set, {
     nullify = (sought, value) => { return { key: null, parts: null } },
@@ -10,6 +12,7 @@ module.exports = function (strata, set, {
     let next = keys.next()
     const iterator = {
         done: false,
+        type: mvcc.MAP,
         next (trampoline, consume, terminator = iterator) {
             if (next.done) {
                 terminator.done = true
