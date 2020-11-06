@@ -37,13 +37,12 @@ require('proof')(6, async okay => {
 
     {
         const destructible = new Destructible([ 'defaults' ])
-        const strata = new Strata(destructible, {
+        const strata = await Strata.open(destructible, {
             directory,
             cache: new Cache,
             compare: ascension([ String, Number ], object => object)
 
         })
-        await strata.open()
         const gathered = [], trampoline = new Trampoline
         const iterator = skip(strata, set)
         iterator.next(trampoline, items => {
@@ -71,8 +70,7 @@ require('proof')(6, async okay => {
 
     {
         const destructible = new Destructible([ 'specified' ])
-        const strata = new Strata(destructible, { directory, cache: new Cache })
-        await strata.open()
+        const strata = await Strata.open(destructible, { directory, cache: new Cache })
         const gathered = [], trampoline = new Trampoline
         const iterator = skip(strata, set, {
             nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
@@ -102,8 +100,7 @@ require('proof')(6, async okay => {
 
     {
         const destructible = new Destructible([ 'reversed' ])
-        const strata = new Strata(destructible, { directory, cache: new Cache })
-        await strata.open()
+        const strata = await Strata.open(destructible, { directory, cache: new Cache })
         const gathered = [], trampoline = new Trampoline
         const iterator = skip(strata, set.reverse(), {
             nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
@@ -124,8 +121,7 @@ require('proof')(6, async okay => {
 
     {
         const destructible = new Destructible([ 'partial' ])
-        const strata = new Strata(destructible, { directory, cache: new Cache })
-        await strata.open()
+        const strata = await Strata.open(destructible, { directory, cache: new Cache })
         const gathered = [], trampoline = new Trampoline
         const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ], [ 'm' ], [ 'n' ] ], {
             group: (sought, key) => {
