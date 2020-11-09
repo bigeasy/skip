@@ -4,6 +4,7 @@ require('proof')(6, async okay => {
     const path = require('path')
 
     const ascension = require('ascension')
+    const whittle = require('whittle')
     const Strata = require('b-tree')
     const Cache = require('b-tree/cache')
     const Trampoline = require('reciprocate')
@@ -13,7 +14,8 @@ require('proof')(6, async okay => {
 
     const directory = path.resolve(__dirname, './tmp/skip')
 
-    const partial = ascension([ String ], object => object)
+    const comparator = ascension([ String, Number ])
+    const partial = whittle(ascension([ String ]), key => key.slice(0, 1))
 
     await utilities.reset(directory)
     await utilities.serialize(directory, {
@@ -40,8 +42,7 @@ require('proof')(6, async okay => {
         const strata = await Strata.open(destructible, {
             directory,
             cache: new Cache,
-            compare: ascension([ String, Number ], object => object)
-
+            compare: comparator
         })
         const gathered = [], trampoline = new Trampoline
         const iterator = skip(strata, set)
@@ -125,7 +126,7 @@ require('proof')(6, async okay => {
         const gathered = [], trampoline = new Trampoline
         const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ], [ 'm' ], [ 'n' ] ], {
             group: (sought, key) => {
-                return partial(sought[0], key[0]) == 0
+                return partial(sought, key) == 0
             }
         })
         while (!iterator.done) {

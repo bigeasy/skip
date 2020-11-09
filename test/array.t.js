@@ -4,6 +4,7 @@ require('proof')(5, okay => {
     const assert = require('assert')
 
     const ascension = require('ascension')
+    const whittle = require('whittle')
     const Trampoline = require('reciprocate')
 
     const letters = [ 'a', 'b', 'c', 'f', 'g', 'j', 'k', 'l' ]
@@ -46,11 +47,11 @@ require('proof')(5, okay => {
         array.splice(1, 0, {
             key: [ 'a', 1 ], parts: [ 'a' ]
         })
-        const comparator = ascension([ String, Number ], object => object)
-        const partial = ascension([ String ], object => object)
+        const comparator = ascension([ String, Number ])
+        const partial = whittle(comparator, key => key.slice(0, 1))
         const iterator = skip.array(comparator, array, [ [ 'a' ], [ 'c' ], [ 'd' ] ], {
             group: (sought, items, index) => {
-                return partial(sought[0], items[index].key[0]) == 0
+                return partial(sought, items[index].key) == 0
             }
         })
         const gathered = []

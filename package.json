@@ -25,11 +25,12 @@
     },
     "devDependencies":
     {
-                            "ascension":                    "2.0.0",
+                            "ascension":                    "3.0.0-alpha.0",
                             "b-tree":                       "2.0.0-alpha.65",
                             "destructible":                 "7.0.0-alpha.14",
                             "proof":                        "^9.0.2",
-                            "reciprocate":                  "0.0.2"
+                            "reciprocate":                  "0.0.2",
+                            "whittle":                      "0.0.0"
     },
     "scripts":
     {
