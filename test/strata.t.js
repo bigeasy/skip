@@ -6,9 +6,10 @@ require('proof')(6, async okay => {
     const ascension = require('ascension')
     const whittle = require('whittle')
     const Strata = require('b-tree')
-    const Cache = require('b-tree/cache')
+    const Cache = require('magazine')
     const Trampoline = require('reciprocate')
     const Destructible = require('destructible')
+    const Turnstile = require('turnstile')
 
     const utilities = require('b-tree/utilities')
 
@@ -38,25 +39,15 @@ require('proof')(6, async okay => {
     })
 
     {
-        const destructible = new Destructible([ 'defaults' ])
-        const strata = await Strata.open(destructible, {
-            directory,
-            cache: new Cache,
-            compare: comparator
-        })
-        const gathered = [], trampoline = new Trampoline
-        const iterator = skip(strata, set)
-        iterator.next(trampoline, items => {
-            okay(items.length, 3, 'default slice limit')
-            for (const item of items) {
-                gathered.push(item)
-            }
-        })
-        while (trampoline.seek()) {
-            await trampoline.shift()
-        }
-        while (!iterator.done) {
+        const destructible = new Destructible($ => $(), 'defaults')
+        const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
+        const cache = new Cache
+        destructible.rescue($ => $(), 'test', async () => {
+            const strata = await Strata.open(destructible.durable($ => $(), 'strata'), { directory, cache, turnstile, compare: comparator })
+            const gathered = [], trampoline = new Trampoline
+            const iterator = skip(strata, set)
             iterator.next(trampoline, items => {
+                okay(items.length, 3, 'default slice limit')
                 for (const item of items) {
                     gathered.push(item)
                 }
@@ -64,29 +55,34 @@ require('proof')(6, async okay => {
             while (trampoline.seek()) {
                 await trampoline.shift()
             }
-        }
-        okay(gathered, expected, 'defaults')
-        strata.destructible.destroy().rejected
+            while (!iterator.done) {
+                iterator.next(trampoline, items => {
+                    for (const item of items) {
+                        gathered.push(item)
+                    }
+                })
+                while (trampoline.seek()) {
+                    await trampoline.shift()
+                }
+            }
+            okay(gathered, expected, 'defaults')
+            destructible.destroy()
+        })
+        await destructible.rejected
     }
 
     {
-        const destructible = new Destructible([ 'specified' ])
-        const strata = await Strata.open(destructible, { directory, cache: new Cache })
-        const gathered = [], trampoline = new Trampoline
-        const iterator = skip(strata, set, {
-            nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
-        })
-        iterator.next(trampoline, items => {
-            okay(items.length, 2, 'slice limited')
-            for (const item of items) {
-                gathered.push(item)
-            }
-        })
-        while (trampoline.seek()) {
-            await trampoline.shift()
-        }
-        while (!iterator.done) {
+        const destructible = new Destructible($ => $(), 'specified')
+        const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
+        const cache = new Cache
+        destructible.rescue($ => $(), 'test', async () => {
+            const strata = await Strata.open(destructible.durable($ => $(), 'strata'), { directory, cache, turnstile, compare: comparator })
+            const gathered = [], trampoline = new Trampoline
+            const iterator = skip(strata, set, {
+                nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
+            })
             iterator.next(trampoline, items => {
+                okay(items.length, 2, 'slice limited')
                 for (const item of items) {
                     gathered.push(item)
                 }
@@ -94,88 +90,109 @@ require('proof')(6, async okay => {
             while (trampoline.seek()) {
                 await trampoline.shift()
             }
-        }
-        okay(gathered, expected, 'specified')
-        strata.destructible.destroy().rejected
+            while (!iterator.done) {
+                iterator.next(trampoline, items => {
+                    for (const item of items) {
+                        gathered.push(item)
+                    }
+                })
+                while (trampoline.seek()) {
+                    await trampoline.shift()
+                }
+            }
+            okay(gathered, expected, 'specified')
+            destructible.destroy()
+        })
+        await destructible.rejected
     }
 
     {
-        const destructible = new Destructible([ 'reversed' ])
-        const strata = await Strata.open(destructible, { directory, cache: new Cache })
-        const gathered = [], trampoline = new Trampoline
-        const iterator = skip(strata, set.reverse(), {
-            nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
-        })
-        while (!iterator.done) {
-            iterator.next(trampoline, items => {
-                for (const item of items) {
-                    gathered.push(item)
-                }
+        const destructible = new Destructible($ => $(), 'reversed')
+        const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
+        const cache = new Cache
+        destructible.rescue($ => $(), 'test', async () => {
+            const strata = await Strata.open(destructible.durable($ => $(), 'strata'), { directory, cache, turnstile, compare: comparator })
+            const gathered = [], trampoline = new Trampoline
+            const iterator = skip(strata, set.reverse(), {
+                nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
             })
-            while (trampoline.seek()) {
-                await trampoline.shift()
+            while (!iterator.done) {
+                iterator.next(trampoline, items => {
+                    for (const item of items) {
+                        gathered.push(item)
+                    }
+                })
+                while (trampoline.seek()) {
+                    await trampoline.shift()
+                }
             }
-        }
-        okay(gathered, expected.reverse(), 'reversed')
-        strata.destructible.destroy().rejected
+            okay(gathered, expected.reverse(), 'reversed')
+            destructible.destroy()
+        })
+        await destructible.rejected
     }
 
     {
-        const destructible = new Destructible([ 'partial' ])
-        const strata = await Strata.open(destructible, { directory, cache: new Cache })
-        const gathered = [], trampoline = new Trampoline
-        const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ], [ 'm' ], [ 'n' ] ], {
-            group: (sought, key) => {
-                return partial(sought, key) == 0
-            }
-        })
-        while (!iterator.done) {
-            iterator.next(trampoline, items => {
-                for (const item of items) {
-                    gathered.push(item)
+        const destructible = new Destructible($ => $(), 'partial')
+        const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
+        const cache = new Cache
+        destructible.rescue($ => $(), 'test', async () => {
+            const strata = await Strata.open(destructible.durable($ => $(), 'strata'), { directory, cache, turnstile, compare: comparator })
+            const gathered = [], trampoline = new Trampoline
+            const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ], [ 'm' ], [ 'n' ] ], {
+                group: (sought, key) => {
+                    return partial(sought, key) == 0
                 }
             })
-            while (trampoline.seek()) {
-                await trampoline.shift()
+            while (!iterator.done) {
+                iterator.next(trampoline, items => {
+                    for (const item of items) {
+                        gathered.push(item)
+                    }
+                })
+                while (trampoline.seek()) {
+                    await trampoline.shift()
+                }
             }
-        }
-        okay(gathered, [
-            {
-                key: [ 'a' ],
-                value: [ 'a' ],
-                items: [{
-                    key: [ 'a', 0 ], parts: [[ 'a', 0 ]]
+            okay(gathered, [
+                {
+                    key: [ 'a' ],
+                    value: [ 'a' ],
+                    items: [{
+                        key: [ 'a', 0 ], parts: [[ 'a', 0 ]]
+                    }, {
+                        key: [ 'a', 1 ], parts: [[ 'a', 1 ]]
+                    }]
                 }, {
-                    key: [ 'a', 1 ], parts: [[ 'a', 1 ]]
-                }]
-            }, {
-                key: [ 'b' ],
-                value: [ 'b' ],
-                items: [{ key: [ 'b', 0 ], parts: [[ 'b', 0 ]] }]
-             }, {
-                key: [ 'c' ],
-                value: [ 'c' ],
-                items: [{
-                    key: [ 'c', 0 ], parts: [ [ 'c', 0 ] ]
+                    key: [ 'b' ],
+                    value: [ 'b' ],
+                    items: [{ key: [ 'b', 0 ], parts: [[ 'b', 0 ]] }]
+                 }, {
+                    key: [ 'c' ],
+                    value: [ 'c' ],
+                    items: [{
+                        key: [ 'c', 0 ], parts: [ [ 'c', 0 ] ]
+                    }, {
+                        key: [ 'c', 1 ], parts: [ [ 'c', 1 ] ]
+                    }, {
+                        key: [ 'c', 2 ], parts: [ [ 'c', 2 ] ],
+                    }],
                 }, {
-                    key: [ 'c', 1 ], parts: [ [ 'c', 1 ] ]
+                    key: [ 'm' ],
+                    value: [ 'm' ],
+                    items: [{
+                        key: [ 'm', 0 ], parts: [ [ 'm', 0 ] ],
+                    }, {
+                        key: [ 'm', 2 ], parts: [ [ 'm', 2 ] ],
+                    }, {
+                        key: [ 'm', 3 ], parts: [ [ 'm', 3 ] ]
+                    }]
                 }, {
-                    key: [ 'c', 2 ], parts: [ [ 'c', 2 ] ],
-                }],
-            }, {
-                key: [ 'm' ],
-                value: [ 'm' ],
-                items: [{
-                    key: [ 'm', 0 ], parts: [ [ 'm', 0 ] ],
-                }, {
-                    key: [ 'm', 2 ], parts: [ [ 'm', 2 ] ],
-                }, {
-                    key: [ 'm', 3 ], parts: [ [ 'm', 3 ] ]
-                }]
-            }, {
-               key: [ 'n' ], value: [ 'n' ], items: []
-           }
-        ], 'partial')
-        strata.destructible.destroy().rejected
+                   key: [ 'n' ], value: [ 'n' ], items: []
+               }
+            ], 'partial')
+            destructible.destroy()
+        })
+        await destructible.rejected
     }
 })
