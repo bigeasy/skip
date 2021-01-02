@@ -72,6 +72,7 @@ require('proof')(6, async okay => {
             destructible.destroy()
         })
         await destructible.promise
+        await handles.shrink(0)
     }
 
     {
@@ -109,6 +110,7 @@ require('proof')(6, async okay => {
             destructible.destroy()
         })
         await destructible.promise
+        await handles.shrink(0)
     }
 
     {
@@ -137,6 +139,7 @@ require('proof')(6, async okay => {
             destructible.destroy()
         })
         await destructible.promise
+        await handles.shrink(0)
     }
 
     {
@@ -203,5 +206,6 @@ require('proof')(6, async okay => {
             destructible.destroy()
         })
         await destructible.promise
+        await handles.shrink(0)
     }
 })
