@@ -44,9 +44,9 @@ require('proof')(6, async okay => {
         const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
         const pages = new Magazine
         const handles = new FileSystem.HandleCache(new Magazine)
-        const storage = new FileSystem(directory, handles)
+        const storage = await FileSystem.open({ directory, handles })
         destructible.rescue($ => $(), 'test', async () => {
-            const strata = await Strata.open(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
+            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
             const gathered = [], trampoline = new Trampoline
             const iterator = skip(strata, set)
             iterator.next(trampoline, items => {
@@ -80,9 +80,9 @@ require('proof')(6, async okay => {
         const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
         const pages = new Magazine
         const handles = new FileSystem.HandleCache(new Magazine)
-        const storage = new FileSystem(directory, handles)
+        const storage = await FileSystem.open({ directory, handles })
         destructible.rescue($ => $(), 'test', async () => {
-            const strata = await Strata.open(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
+            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
             const gathered = [], trampoline = new Trampoline
             const iterator = skip(strata, set, {
                 nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
@@ -118,9 +118,9 @@ require('proof')(6, async okay => {
         const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
         const pages = new Magazine
         const handles = new FileSystem.HandleCache(new Magazine)
-        const storage = new FileSystem(directory, handles)
+        const storage = await FileSystem.open({ directory, handles })
         destructible.rescue($ => $(), 'test', async () => {
-            const strata = await Strata.open(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
+            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
             const gathered = [], trampoline = new Trampoline
             const iterator = skip(strata, set.reverse(), {
                 nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
@@ -147,9 +147,9 @@ require('proof')(6, async okay => {
         const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
         const pages = new Magazine
         const handles = new FileSystem.HandleCache(new Magazine)
-        const storage = new FileSystem(directory, handles)
+        const storage = await FileSystem.open({ directory, handles })
         destructible.rescue($ => $(), 'test', async () => {
-            const strata = await Strata.open(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
+            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
             const gathered = [], trampoline = new Trampoline
             const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ], [ 'm' ], [ 'n' ] ], {
                 group: (sought, key) => {
