@@ -32,7 +32,7 @@
                             "operation":                    "6.0.0-alpha.12",
                             "proof":                        "^9.0.2",
                             "reciprocate":                  "0.0.9",
-                            "turnstile":                    "6.0.0-alpha.81",
+                            "turnstile":                    "6.0.0-alpha.82",
                             "whittle":                      "0.0.3"
     },
     "scripts":
