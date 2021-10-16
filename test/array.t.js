@@ -5,7 +5,7 @@ require('proof')(5, okay => {
 
     const ascension = require('ascension')
     const whittle = require('whittle')
-    const Trampoline = require('reciprocate')
+    const { Trampoline } = require('reciprocate')
 
     const letters = [ 'a', 'b', 'c', 'f', 'g', 'j', 'k', 'l' ]
     const comparator = (left, right) => (left > right) - (left < right)

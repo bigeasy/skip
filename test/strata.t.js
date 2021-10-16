@@ -9,7 +9,7 @@ require('proof')(6, async okay => {
     const Operation = require('operation')
     const FileSystem = require('b-tree/filesystem')
     const Magazine = require('magazine')
-    const Trampoline = require('reciprocate')
+    const { Trampoline } = require('reciprocate')
     const Destructible = require('destructible')
     const Turnstile = require('turnstile')
 
