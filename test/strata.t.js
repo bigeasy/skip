@@ -18,7 +18,6 @@ require('proof')(6, async okay => {
     const directory = path.resolve(__dirname, './tmp/skip')
 
     const comparator = ascension([ String, Number ])
-    const partial = whittle(ascension([ String ]), key => key.slice(0, 1))
 
     await utilities.reset(directory)
     await utilities.serialize(directory, {
@@ -30,6 +29,10 @@ require('proof')(6, async okay => {
         [ 'insert', 3, [ 'm', 0 ] ], [ 'delete', 0 ] ],
       '1.5': [ [ 'insert', 0, [ 'm', 1 ] ], [ 'insert', 1, [ 'm', 2 ] ], [ 'insert', 2, [ 'm', 3 ] ], [ 'delete', 0 ] ]
     })
+
+    function extractor (parts) {
+        return parts[0]
+    }
 
     const set = [ 'a', 'b', 'c', 'e', 'f', 'g', 'j' ].map(letter => [ letter, 0 ])
     const expected = set.map(letter => {
@@ -45,9 +48,9 @@ require('proof')(6, async okay => {
         const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
         const pages = new Magazine
         const handles = new Operation.Cache(new Magazine)
-        const storage = new FileSystem.Writer(destructible.durable($ => $(), 'storage'), await FileSystem.open({ directory, handles }))
+        const storage = new FileSystem.Writer(destructible.durable($ => $(), 'storage'), await FileSystem.open({ extractor, directory, handles }))
         destructible.ephemeral($ => $(), 'test', async () => {
-            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
+            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, comparator })
             const gathered = [], trampoline = new Trampoline
             const iterator = skip(strata, set)
             iterator.next(trampoline, items => {
@@ -81,9 +84,9 @@ require('proof')(6, async okay => {
         const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
         const pages = new Magazine
         const handles = new Operation.Cache(new Magazine)
-        const storage = new FileSystem.Writer(destructible.durable($ => $(), 'storage'), await FileSystem.open({ directory, handles }))
+        const storage = new FileSystem.Writer(destructible.durable($ => $(), 'storage'), await FileSystem.open({ directory, handles, extractor }))
         destructible.ephemeral($ => $(), 'test', async () => {
-            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
+            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, comparator })
             const gathered = [], trampoline = new Trampoline
             const iterator = skip(strata, set, {
                 nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
@@ -119,9 +122,9 @@ require('proof')(6, async okay => {
         const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
         const pages = new Magazine
         const handles = new Operation.Cache(new Magazine)
-        const storage = new FileSystem.Writer(destructible.durable($ => $(), 'storage'), await FileSystem.open({ directory, handles }))
+        const storage = new FileSystem.Writer(destructible.durable($ => $(), 'storage'), await FileSystem.open({ directory, handles, extractor }))
         destructible.ephemeral($ => $(), 'test', async () => {
-            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
+            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, comparator })
             const gathered = [], trampoline = new Trampoline
             const iterator = skip(strata, set.reverse(), {
                 nullify: key => { return { key: null, parts: null } }, extractor: $ => $, slice: 2
@@ -144,13 +147,14 @@ require('proof')(6, async okay => {
     }
 
     {
+        const partial = whittle(ascension([ String ]), key => key.slice(0, 1))
         const destructible = new Destructible($ => $(), 'partial')
         const turnstile = new Turnstile(destructible.durable($ => $(), 'turnstile'))
         const pages = new Magazine
         const handles = new Operation.Cache(new Magazine)
-        const storage = new FileSystem.Writer(destructible.durable($ => $(), 'storage'), await FileSystem.open({ directory, handles }))
+        const storage = new FileSystem.Writer(destructible.durable($ => $(), 'storage'), await FileSystem.open({ directory, handles, extractor }))
         destructible.ephemeral($ => $(), 'test', async () => {
-            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, compare: comparator })
+            const strata = new Strata(destructible.durable($ => $(), 'strata'), { storage, pages, turnstile, comparator })
             const gathered = [], trampoline = new Trampoline
             const iterator = skip(strata, [ [ 'a' ], [ 'b' ], [ 'c' ], [ 'm' ], [ 'n' ] ], {
                 group: (sought, key) => {
