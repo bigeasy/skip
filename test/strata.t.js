@@ -17,7 +17,7 @@ require('proof')(6, async okay => {
 
     const directory = path.resolve(__dirname, './tmp/skip')
 
-    const comparator = ascension([ String, Number ])
+    const comparator = ascension([ String, Number ], true)
 
     await utilities.reset(directory)
     await utilities.serialize(directory, {
