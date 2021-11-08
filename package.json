@@ -1,6 +1,6 @@
 {
     "name":                 "skip",
-    "version":              "0.2.57",
+    "version":              "0.2.58",
     "description":
 
       "Optimized retrieval of a set of records from a Strata b-tree.",
