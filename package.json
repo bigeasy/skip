@@ -33,7 +33,7 @@
                             "proof":                        "^9.0.2",
                             "reciprocate":                  "0.0.10",
                             "turnstile":                    "6.0.0-alpha.83",
-                            "whittle":                      "0.0.5"
+                            "whittle":                      "0.0.6"
     },
     "scripts":
     {
